@@ -7,6 +7,7 @@ function App() {
   const [category, setCategory] = useState('general');
   const [darkMode, setDarkMode] = useState(false);
   const [search, setSearch] = useState('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(() => {
     const saved = localStorage.getItem('bookmarks');
     return saved ? JSON.parse(saved) : [];
@@ -69,76 +70,94 @@ function App() {
       
       {/* ===== NAVBAR ===== */}
       <nav className={`sticky top-0 z-50 shadow-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            <h1 className={`text-2xl font-bold transition-colors ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-              NewsSphere
-            </h1>
-
-            <div className="hidden md:flex space-x-6">
-              {categories.map((cat) => (
-                <button
-                  key={cat.slug}
-                  onClick={() => setCategory(cat.slug)}
-                  className={`text-sm font-medium transition-colors ${
-                    category === cat.slug
-                      ? `border-b-2 border-blue-600 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`
-                      : darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col gap-3 py-3 md:py-0 md:flex-row md:justify-between md:items-center">
+            <div className="flex items-center justify-between">
+              <h1 className={`text-2xl font-bold transition-colors ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                NewsSphere
+              </h1>
+              <button
+                onClick={() => setMobileNavOpen((prev) => !prev)}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileNavOpen ? '✕' : '☰'}
+              </button>
             </div>
 
-            <div className="flex items-center space-x-3">
-              {/* Search */}
+            <div className="hidden md:flex items-center space-x-3">
               <input
                 type="text"
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className={`px-3 py-1.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
+                className={`w-64 max-w-xs px-3 py-1.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
                   darkMode 
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                     : 'bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500'
                 }`}
               />
-              
-              {/* Dark Mode Toggle */}
               <button
                 onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-lg transition ${
                   darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
                 }`}
+                aria-label="Toggle dark mode"
               >
                 {darkMode ? '☀️' : '🌙'}
               </button>
             </div>
           </div>
 
-          {/* Mobile Categories */}
-          <div className="md:hidden flex flex-wrap gap-2 py-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.slug}
-                onClick={() => setCategory(cat.slug)}
-                className={`px-3 py-1 text-xs rounded-full transition ${
-                  category === cat.slug
-                    ? 'bg-blue-600 text-white'
-                    : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
+          {mobileNavOpen && (
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={`w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.slug}
+                      onClick={() => {
+                        setCategory(cat.slug);
+                        setMobileNavOpen(false);
+                      }}
+                      className={`px-3 py-1 text-xs rounded-full transition ${
+                        category === cat.slug
+                          ? 'bg-blue-600 text-white'
+                          : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`w-full px-4 py-2 rounded-lg transition ${
+                    darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
+                >
+                  Toggle {darkMode ? 'Light' : 'Dark'} Mode
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* ===== MAIN CONTENT ===== */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
           <h2 className={`text-xl font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
             {category.charAt(0).toUpperCase() + category.slice(1)} News
           </h2>

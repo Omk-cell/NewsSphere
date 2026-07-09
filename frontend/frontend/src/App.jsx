@@ -10,6 +10,7 @@ function App() {
   const [category, setCategory] = useState('general');
   const [darkMode, setDarkMode] = useState(false);
   const [search, setSearch] = useState('');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(getBookmarks());
   const location = useLocation();
 
@@ -208,29 +209,28 @@ function App() {
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <nav className={`sticky top-0 z-50 shadow-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
             <Link to="/" className={`text-2xl font-bold transition-colors ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
               NewsSphere
             </Link>
 
-            <div className="hidden md:flex space-x-6">
-              {categories.map((cat) => (
-                <button
-                  key={cat.slug}
-                  onClick={() => setCategory(cat.slug)}
-                  className={`text-sm font-medium transition-colors ${
-                    category === cat.slug
-                      ? `border-b-2 border-blue-600 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`
-                      : darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center space-x-3">
+            <div className="hidden md:flex items-center space-x-3">
+              <div className="hidden lg:flex space-x-6">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.slug}
+                    onClick={() => setCategory(cat.slug)}
+                    className={`text-sm font-medium transition-colors ${
+                      category === cat.slug
+                        ? `border-b-2 border-blue-600 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`
+                        : darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
               <Link
                 to="/bookmarks"
                 className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -242,7 +242,7 @@ function App() {
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className={`px-3 py-1.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
+                className={`w-56 max-w-xs px-3 py-1.5 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
                   darkMode
                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                     : 'bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500'
@@ -256,27 +256,71 @@ function App() {
                 {darkMode ? '☀️' : '🌙'}
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen((prev) => !prev)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              {mobileNavOpen ? '✕' : '☰'}
+            </button>
           </div>
 
-          <div className="md:hidden flex flex-wrap gap-2 py-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.slug}
-                onClick={() => setCategory(cat.slug)}
-                className={`px-3 py-1 text-xs rounded-full transition ${
-                  category === cat.slug
-                    ? 'bg-blue-600 text-white'
-                    : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
+          {mobileNavOpen && (
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={`w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-600 transition ${
+                    darkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-gray-100 border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.slug}
+                      onClick={() => {
+                        setCategory(cat.slug);
+                        setMobileNavOpen(false);
+                      }}
+                      className={`px-3 py-1 text-xs rounded-full transition ${
+                        category === cat.slug
+                          ? 'bg-blue-600 text-white'
+                          : darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    to="/bookmarks"
+                    className={`block w-full text-center rounded-lg px-4 py-2 text-sm font-medium transition ${darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    🔖 Bookmarks
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setDarkMode(!darkMode)}
+                    className={`w-full rounded-lg px-4 py-2 text-sm font-medium transition ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'}`}
+                  >
+                    Toggle {darkMode ? 'Light' : 'Dark'} Mode
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <Routes>
           <Route path="/" element={renderHomePage()} />
           <Route path="/bookmarks" element={renderBookmarksPage()} />
@@ -285,7 +329,7 @@ function App() {
       </main>
 
       <footer className={`mt-12 border-t transition-colors duration-300 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             <p>© 2026 NewsSphere. All rights reserved.</p>
             <p className="mt-1">📚 {bookmarks.length} bookmarks saved</p>
